@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug App Server",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/app-server",
+      "args": [],
+      "env": {},
+      "buildFlags": "-v"
+    }
+  ]
+}
+
