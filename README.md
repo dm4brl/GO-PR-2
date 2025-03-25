@@ -70,18 +70,30 @@ GO-PR-2 — это система центрального управления 
 ## Структура проекта
 
 GO-PR-2/
-│── cmd/                  # Главный исполняемый файл
-│── internal/             # Внутренние модули
-│   ├── config/           # Конфигурация приложения
-│   ├── db/               # Подключение к БД
-│   ├── models/           # Определение моделей (пользователи, устройства, расписание)
-│   ├── services/         # Логика работы с устройствами
-│   ├── api/              # HTTP API
-│── pkg/                  # Общие библиотеки
-│── scripts/              # Скрипты развертывания
-│── go.mod                # Модуль Go
-│── go.sum                # Контроль зависимостей
-│── README.md             # Описание проекта
+├── .vscode/
+│   └── launch.json
+├── cmd/
+│   └── app-server/
+│       └── main.go
+├── config/
+│   └── config.yaml
+├── internal/
+│   ├── config/
+│   │   └── config.go
+│   ├── database/
+│   │   └── database.go
+│   ├── models/
+│   │   ├── user.go
+│   │   ├── device.go
+│   │   └── schedule.go
+│   ├── scheduler/
+│   │   └── scheduler.go
+│   └── services/
+│       ├── mqtt.go
+│       └── redis.go
+├── go.mod
+├── go.sum
+└── README.md
 
 
 ## Логика работы бэкенда
