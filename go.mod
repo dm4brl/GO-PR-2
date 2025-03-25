@@ -5,11 +5,16 @@ go 1.21.5
 require github.com/spf13/viper v1.20.0
 
 require (
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
+	golang.org/x/net v0.33.0 // indirect
+	golang.org/x/sync v0.10.0 // indirect
 )
 
 require (
+	github.com/eclipse/paho.mqtt.golang v1.5.0
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
