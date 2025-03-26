@@ -1,33 +1,31 @@
+// internal/database/update.go
 package database
 
 import (
-	"fmt"
+	"log"
+	"time"
 
 	"github.com/dm4brl/GO-PR-2/internal/models"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
-// UpdateSwitchStatus обновляет статус свитча в базе данных
-func UpdateSwitchStatus(status models.SwitchStatus) error {
-	db := GetDB() // получаем соединение с базой данных
+// UpdateSwitchStatus выполняет upsert для свитча: если запись с данным ID существует, она обновляется, иначе создается новая.
+func UpdateSwitchStatus(db *gorm.DB, status models.SwitchStatus) error {
+	// Устанавливаем время обновления
+	status.UpdatedAt = time.Now()
 
-	// Обновляем или создаем запись в таблице switch_statuses
-	result := db.Where("id = ?", status.ID).First(&status)
+	// Используем конструкцию upsert с OnConflict.
+	result := db.Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "id"}}, // по полю id
+		DoUpdates: clause.AssignmentColumns([]string{"state", "timestamp", "updated_at"}),
+	}).Create(&status)
+
 	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
-			// Запись не найдена, создаем новую
-			if err := db.Create(&status).Error; err != nil {
-				return fmt.Errorf("ошибка при создании записи: %v", err)
-			}
-		} else {
-			return fmt.Errorf("ошибка при поиске записи: %v", result.Error)
-		}
-	} else {
-		// Обновляем существующую запись
-		if err := db.Save(&status).Error; err != nil {
-			return fmt.Errorf("ошибка при обновлении записи: %v", err)
-		}
+		log.Printf("Ошибка обновления статуса свитча с ID %s: %v", status.ID, result.Error)
+		return result.Error
 	}
 
+	log.Printf("Статус свитча с ID %s успешно обновлен", status.ID)
 	return nil
 }

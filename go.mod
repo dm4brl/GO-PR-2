@@ -7,6 +7,8 @@ require (
 	github.com/spf13/viper v1.20.0
 )
 
+require gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
+
 require (
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
@@ -37,6 +39,7 @@ require (
 	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	google.golang.org/protobuf v1.36.1 // indirect
+	gorm.io/gorm v1.25.12
 )
 
 require (
@@ -58,5 +61,4 @@ require (
 	golang.org/x/text v0.21.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/sqlite v1.5.7
-	gorm.io/gorm v1.25.12
 )
