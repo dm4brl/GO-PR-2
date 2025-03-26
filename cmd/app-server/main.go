@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/dm4brl/GO-PR-2/internal/config"
 	"github.com/dm4brl/GO-PR-2/internal/database"
@@ -38,31 +37,28 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"message": "Сервер запущен!"})
 	})
 
-	// Обработчик статуса свитча
+	// Маршрут для получения и обработки статуса свитча
 	router.POST("/api/switch/status", func(c *gin.Context) {
 		var status models.SwitchStatus
 		// Привязываем JSON-пейлоад к структуре SwitchStatus
 		if err := c.ShouldBindJSON(&status); err != nil {
+			log.Printf("Ошибка валидации данных: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		// Обновляем временную метку обновления
-		status.UpdatedAt = time.Now()
+		// Логируем полученные данные
+		log.Printf("Получен статус свитча: ID=%s, State=%v, Timestamp=%d", status.ID, status.State, status.Timestamp)
 
-		// Используем GORM: если запись для данного switch существует, обновляем её,
-		// иначе создаем новую запись.
-		if err := database.DB.
-			Where("id = ?", status.ID).
-			Assign(&status).
-			FirstOrCreate(&status).Error; err != nil {
+		// Вставка или обновление данных в базу данных
+		err := database.UpdateSwitchStatus(status)
+		if err != nil {
 			log.Printf("Ошибка обновления статуса свитча: %v", err)
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Ошибка при обновлении статуса свитча"})
 			return
 		}
 
-		log.Printf("Получен статус свитча: ID=%s, State=%v, Timestamp=%d",
-			status.ID, status.State, status.Timestamp)
+		// Ответ на успешную обработку
 		c.JSON(http.StatusOK, gin.H{"status": "received"})
 	})
 

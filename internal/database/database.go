@@ -4,27 +4,31 @@ import (
 	"log"
 
 	"github.com/dm4brl/GO-PR-2/internal/models"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/sqlite" // Или другой драйвер базы данных
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
 
+// SetupDatabase - функция для настройки базы данных
 func SetupDatabase() {
 	var err error
-
-	// Если хочешь использовать PostgreSQL, поменяй этот блок на:
-	// dsn := config.AppConfig.DatabaseURL
-	// DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	DB, err = gorm.Open(sqlite.Open("app.db"), &gorm.Config{})
+	// Подключаемся к базе данных
+	DB, err = gorm.Open(sqlite.Open("switch_status.db"), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("Ошибка подключения к базе данных: %v", err)
+		log.Fatalf("Ошибка при подключении к базе данных: %v", err)
 	}
 
-	err = DB.AutoMigrate(&models.User{}, &models.Device{}, &models.Schedule{})
+	// Выполняем миграцию
+	err = DB.AutoMigrate(&models.SwitchStatus{})
 	if err != nil {
-		log.Fatalf("Ошибка миграции базы данных: %v", err)
+		log.Fatalf("Ошибка миграции: %v", err)
 	}
 
 	log.Println("База данных настроена и миграция выполнена")
+}
+
+// GetDB - вспомогательная функция для получения экземпляра базы данных
+func GetDB() *gorm.DB {
+	return DB
 }
