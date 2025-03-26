@@ -1,11 +1,11 @@
+// internal/models/switch.go
 package models
 
 import "time"
 
-// SwitchStatus представляет статус свитча, отправляемый эмулятором
+// SwitchStatus определяет структуру для хранения данных о состоянии свитча.
 type SwitchStatus struct {
-	ID        string    `json:"id" gorm:"primaryKey" binding:"required"`
-	State     bool      `json:"state" binding:"required"`
-	Timestamp int64     `json:"timestamp" binding:"required"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        string    `gorm:"primaryKey"`
+	State     bool      `json:"state"`
+	Timestamp time.Time `json:"timestamp"`
 }
