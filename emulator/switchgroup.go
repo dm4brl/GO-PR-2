@@ -26,19 +26,20 @@ type SwitchStatus struct {
 // Функция отправки статуса на сервер
 func sendStatus(state bool, switchID string) {
 	status := SwitchStatus{
-		ID:        switchID,
-		State:     state,
-		Timestamp: time.Now().Unix(),
+		ID:    switchID,
+		State: state,
+		// Используем UnixNano для высокой точности временной метки
+		Timestamp: time.Now().UnixNano(),
 	}
 	jsonData, err := json.Marshal(status)
 	if err != nil {
-		fmt.Println("Error marshaling JSON:", err)
+		fmt.Println("Error marshaling JSON for", switchID, ":", err)
 		return
 	}
 
 	req, err := http.NewRequest("POST", serverURL, bytes.NewBuffer(jsonData))
 	if err != nil {
-		fmt.Println("Error creating request:", err)
+		fmt.Println("Error creating request for", switchID, ":", err)
 		return
 	}
 	req.Header.Set("Authorization", "Bearer "+authToken)
@@ -47,7 +48,7 @@ func sendStatus(state bool, switchID string) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("Error sending status:", err)
+		fmt.Println("Error sending status for", switchID, ":", err)
 		return
 	}
 	defer resp.Body.Close()
@@ -58,32 +59,31 @@ func sendStatus(state bool, switchID string) {
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	// Массив с уникальными идентификаторами свитчей
+	// Генерируем уникальные идентификаторы свитчей
 	switchIDs := []string{}
 	for i := 1; i <= numSwitches; i++ {
-		switchIDs = append(switchIDs, fmt.Sprintf("switch-%03d", i)) // Генерация ID типа switch-001, switch-002 и т.д.
+		switchIDs = append(switchIDs, fmt.Sprintf("switch-%03d", i))
 	}
 
-	// Настроим периодичность отправки статусов
-	ticker := time.NewTicker(pollInterval)
-	defer ticker.Stop()
-
-	// Отправляем начальные статусы для всех свитчей
+	// Отправляем начальные статусы для всех свитчей с небольшой задержкой между ними
 	for _, switchID := range switchIDs {
 		state := rand.Intn(2) == 1
 		fmt.Println("Initial status for", switchID, ":", state)
 		sendStatus(state, switchID)
+		time.Sleep(100 * time.Millisecond)
 	}
 
-	// Отправляем статусы по расписанию
+	// Настраиваем периодическую отправку статусов
+	ticker := time.NewTicker(pollInterval)
+	defer ticker.Stop()
+
 	for {
-		select {
-		case <-ticker.C:
-			for _, switchID := range switchIDs {
-				state := rand.Intn(2) == 1 // случайный ON/OFF
-				fmt.Println("Sending status for", switchID, ":", state)
-				sendStatus(state, switchID)
-			}
+		<-ticker.C
+		for _, switchID := range switchIDs {
+			state := rand.Intn(2) == 1 // Случайный ON/OFF
+			fmt.Println("Sending status for", switchID, ":", state)
+			sendStatus(state, switchID)
+			time.Sleep(100 * time.Millisecond)
 		}
 	}
 }
