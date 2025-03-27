@@ -1,0 +1,29 @@
+version: '3'
+services:
+  influxdb:
+    image: influxdb:latest
+    container_name: influxdb
+    ports:
+      - "8086:8086"  # Порт для InfluxDB
+    volumes:
+      - influxdb-storage:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=mqtt_data
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=adminpassword
+      - INFLUXDB_USER=user
+      - INFLUXDB_USER_PASSWORD=userpassword
+
+  telegraf:
+    image: telegraf:latest
+    container_name: telegraf
+    depends_on:
+      - influxdb
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf
+    environment:
+      - HOSTNAME=telegraf
+    restart: unless-stopped
+
+volumes:
+  influxdb-storage:
